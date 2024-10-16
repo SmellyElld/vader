@@ -6,6 +6,7 @@ import { RouterLink, RouterView } from 'vue-router'
   <header>
     <nav>
       <RouterLink to="/forecast">Forecast</RouterLink>
+      <RouterLink to="/location">Location</RouterLink>
     </nav>
   </header>
 

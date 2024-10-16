@@ -8,13 +8,12 @@ const router = createRouter({
       path: '/forecast',
       name: 'forecast',
       component: ForecastView
-    },/*
+    },
     {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue')
+      path: '/location',
+      name: 'location',
+      component: () => import('@/views/LocationsView.vue')
     }
-  */
   ],
 })
 

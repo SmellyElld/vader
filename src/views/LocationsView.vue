@@ -1,13 +1,13 @@
 <script setup>
-import { ref } from 'vue';
+import router from '@/router';
+import { onMounted, ref } from 'vue';
+
+onMounted(() => {
+    locationsList.value = JSON.parse(localStorage.getItem("locations"));
+})
 
 const location = ref({name: '', position: {lat: 0, long: 0}, default: false})
-const locationsList = ref([
-    {name: 'Mariehamn', position: {lat: 60.0, long: 20.0}, default:false},
-    {name: 'Stockholm', position: {lat: 59.32, long: 18.32}, default: true},
-    {name: 'London', position: {lat: 51.5, long: -0.1}, default: false},
-    {name: 'Cape Town', position: {lat: -34, long: 18.5}, default: false}
-])
+const locationsList = ref([])
 
 function resetInput() {
     const inputs = document.querySelectorAll(".input");
@@ -17,27 +17,46 @@ function resetInput() {
 }
 
 function saveLocation() {
-    locationsList.value.push({name: location.value.name, position: {lat: location.value.position.lat, long: location.value.position.long}, default: false});
+    if (location.value.name != "") {
+        locationsList.value.push({name: location.value.name, position: {lat: location.value.position.lat, long: location.value.position.long}, default: false});
+        resetInput()
+    }
+    if (locationsList.value.find((obj) => {
+        if (obj.default) {
+            return true;
+        }
+        return false;
+    }) == undefined){
+        locationsList.value[0].default = true;
+    }
+    localStorage.setItem("locations", JSON.stringify(locationsList.value))
 }
 
 function removeLocation(e) {
+    let defaultDeleted = false
     locationsList.value = locationsList.value.filter((obj) => {
         let objToDel = locationsList.value.indexOf(obj) == e.target.parentElement.id.slice(12);
         if (obj.default && objToDel) {
-            locationsList.value[0].default = true
+            defaultDeleted = true
         }
         return !objToDel
     })
+    if (defaultDeleted && locationsList.value.length != 0) {
+        locationsList.value[0].default = true
+    }
+    localStorage.setItem("locations", JSON.stringify(locationsList.value))
 }
 
 function setDefault(e) {
     for (let loc of locationsList.value) {
         if (locationsList.value.indexOf(loc) == e.target.parentElement.id.slice(12)) {
             loc.default = true;
+            router.push(`/forecast/${loc.name}`)
         } else {
             loc.default = false;
         }
     }
+    localStorage.setItem("locations", JSON.stringify(locationsList.value));
 }
 </script>
 
@@ -46,7 +65,7 @@ function setDefault(e) {
     <label>Name: <input type="text" v-model="location.name" class="input" /></label>
     <label>Lat: <input type="number" max="90" min="-90" step="0.1" size="5" v-model="location.position.lat" class="input"></label>
     <label>Long: <input type="number" max="180" min="-180" step="0.1" size="8" v-model="location.position.long" class="input"></label>
-    <button @click="saveLocation()">Save</button><button @click="resetInput">Reset</button>
+    <button @click="saveLocation">Save</button><button @click="resetInput">Reset</button>
     <hr>
     <h3>List</h3>
         <ul id="locationList">

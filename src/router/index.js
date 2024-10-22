@@ -13,6 +13,12 @@ const router = createRouter({
       path: '/location',
       name: 'location',
       component: () => import('@/views/LocationsView.vue')
+    },
+    {
+      path: '/forecast/:location',
+      name: 'forecast_location',
+      component: ForecastView,
+      props: true
     }
   ],
 })

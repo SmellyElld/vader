@@ -41,6 +41,8 @@ watchEffect(() => {
 });
 
 function getCoords(rawCords) {
+    Math.abs(rawCords.lat).toFixed(2)
+
     return {
         lat: Math.abs(rawCords.lat).toFixed(2) + "°" + (rawCords.lat < 0 ? 'S' : 'N'),
         long: Math.abs(rawCords.long).toFixed(2) + "°" + (rawCords.long < 0 ? 'W' : 'E') , 
@@ -72,8 +74,7 @@ h2.locationContainer {
     display: inline;
 }
 .locationContainer {
-    background: linear-gradient(-45deg, #e0f7ff, #ffffff);
-    border: 0.005em solid rgb(189, 189, 189);
+    background: linear-gradient(45deg, #e0f7ff, #ffffff);
     border-radius: 0.5em;
     padding: 0.3em;
 }

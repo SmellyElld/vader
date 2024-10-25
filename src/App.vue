@@ -1,13 +1,15 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+import BurgerMenu from './components/BurgerMenu.vue';
+import { ref } from 'vue';
+
+const menuActive = ref(false);
+
 </script>
 
 <template>
   <header>
-    <nav>
-      <RouterLink to="/forecast">Forecast</RouterLink>
-      <RouterLink to="/location">Location</RouterLink>
-    </nav>
+    <BurgerMenu @toggle-menu="menuActive = !menuActive" :active="menuActive" />
   </header>
 
   <RouterView />

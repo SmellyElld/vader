@@ -14,7 +14,7 @@ function getText(code) {
 </script>
 
 <template>
-    <ul>
+    <ul id="header">
         <li>Date</li>
         <li>Temp</li>
         <li>Precip</li>
@@ -33,19 +33,30 @@ function getText(code) {
 
 <style scoped>
     ul {
-        padding: 0;
+        padding:  5px;
         display: grid;
-        grid-template-columns: 20% 20% 15% auto;
+        grid-template-columns: 25% 25% 20% auto;
+        border-radius: 10px;
+            align-items: center;
     }
     ul:nth-child(even) {
-        background-color: aqua;
+        background-color: rgb(198, 240, 255);
     }
     ul:nth-child(odd) {
-        background-color: antiquewhite;
+        background-color: rgb(235, 242, 254);
     }
     li {
         padding: 0 .5em;
         list-style-type: none;
         vertical-align: top;
+        font-weight: 350;
+    }
+    ul#header {
+        padding:  5px;
+        background-color: rgb(0, 208, 255);
+    }
+    ul#header li {
+        font-size: 1.05em;
+        font-weight: 450;
     }
 </style>

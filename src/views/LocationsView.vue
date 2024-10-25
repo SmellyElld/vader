@@ -1,10 +1,34 @@
 <script setup>
 import router from '@/router';
+import { getPosistion } from '@/services/positioningService';
 import { onMounted, ref } from 'vue';
 
 onMounted(() => {
     locationsList.value = JSON.parse(localStorage.getItem("locations"));
-})
+    let current = locationsList.value.find(loc => {
+        return loc.name === 'Current location'
+    });
+    if (!current) {
+        current = {name: 'Current location', position: {lat: 0, long: 0}, default: false};
+        locationsList.value.unshift(current)
+    }
+
+    getPosistion()
+        .then(response => {
+            current.position = response.position
+            let index = locationsList.value.findIndex(loc => {
+                return loc.name === 'Current location';
+            });
+            locationsList.value.splice(index, 1, current);
+        })
+        .catch(err => {
+            let index = locationsList.value.findIndex(loc => {
+                return loc.name === 'Current location';
+            });
+            locationsList.value.splice(index, 1);
+            console.log(err)
+        })
+});
 
 const location = ref({name: '', position: {lat: 0, long: 0}, default: false})
 const locationsList = ref([])
@@ -15,6 +39,7 @@ function resetInput() {
         input.value = "";
     }
 }
+
 
 function saveLocation() {
     if (location.value.name != "") {
@@ -76,7 +101,7 @@ function setDefault(e) {
                     {{ Math.abs(loc.position.long).toFixed(2) }}°{{ loc.position.long > 0 ? 'E' : 'W'}}
                     )
                 </span>
-                <span class="delete" @click="removeLocation">x</span>
+                <span class="delete" @click="removeLocation" v-show="loc.name !== 'Current location'">x</span>
             </li>
         </ul>
 </template>

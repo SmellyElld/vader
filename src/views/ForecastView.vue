@@ -11,6 +11,7 @@ const props = defineProps(['location'])
 
 watchEffect(() => {
     let locationsList = JSON.parse(localStorage.getItem('locations'));
+    console.log(locationsList);
     if (props.location) {
         currentLocation.value = locationsList.find(loc => {
             return loc.name.toLocaleLowerCase() === props.location.toLocaleLowerCase()

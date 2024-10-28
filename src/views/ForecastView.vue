@@ -11,7 +11,6 @@ const props = defineProps(['location'])
 
 watchEffect(() => {
     let locationsList = JSON.parse(localStorage.getItem('locations'));
-    console.log(locationsList);
     if (props.location) {
         currentLocation.value = locationsList.find(loc => {
             return loc.name.toLocaleLowerCase() === props.location.toLocaleLowerCase()
@@ -33,7 +32,6 @@ watchEffect(() => {
         getCurrent(currentLocation.value)
             .then(response => {
                 currentData.value = response;
-                console.log(currentData.value)
             })
             .catch(err => {
                 console.log(err);

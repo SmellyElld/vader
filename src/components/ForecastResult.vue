@@ -20,7 +20,11 @@ function getText(code) {
         <li>Precip</li>
         <li>Wind</li>
     </ul>
-    <ul v-for="day in props.forecast.weather" :key="day">
+    <div v-for="day in props.forecast.weather" :key="day" class="forecastNav">
+        <div class="dayCard" :id="'daycardID' + day.date" @click="showForecast(day.date)">
+
+        </div>
+
         <li>
             {{ new Date(day.date).getDate() }}.{{ new Date(day.date).getMonth() + 1 }}<br>
             {{ getText(day.code) }}
@@ -28,7 +32,8 @@ function getText(code) {
         <li>{{ day.temp.min }}{{ day.temp.unit }} - {{ day.temp.max }}{{ day.temp.unit }}</li>
         <li>{{ day.precipitation.sum }}{{ day.precipitation.unit }}<br>({{ day.precipitation.probability}}%)</li>
         <li>{{ Math.round(day.wind.speed) }} ({{ Math.round(day.wind.gusts) }}){{ day.wind.unit }}<br>{{ day.wind.direction }}{{ day.wind.direction_unit }}</li>
-    </ul>
+    </div>
+    <div class="forecast"></div>
 </template>
 
 <style scoped>
@@ -37,7 +42,7 @@ function getText(code) {
         display: grid;
         grid-template-columns: 25% 25% 20% auto;
         border-radius: 10px;
-            align-items: center;
+        align-items: center;
     }
     ul:nth-child(even) {
         background-color: rgb(198, 240, 255);

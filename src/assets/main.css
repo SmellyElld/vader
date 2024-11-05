@@ -1,5 +1,28 @@
 @import './base.css';
 
+/* Hide the default scrollbar track and add minimal styling */
+::-webkit-scrollbar {
+  width: 6px; /* Width of the vertical scrollbar */
+  height: 6px; /* Height of the horizontal scrollbar (for horizontal scrolling) */
+}
+
+::-webkit-scrollbar-track {
+  background: #ffffff; /* Color of the track */
+  height: 0;
+  width: 0;
+  border-radius: 10px; /* Round corners on the track */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Round corners on the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Darker color on hover for the thumb */
+}
+
+
 #app {
   max-width: 1280px;
   margin: 0 auto;
@@ -21,9 +44,8 @@ a,
   }
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 650px) {
   #app{
-    padding-left: 0.1rem;
-    padding-right: 0.1rem;
+    padding: 0;
   }
 }

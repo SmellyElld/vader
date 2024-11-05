@@ -61,6 +61,7 @@ function getCoords(rawCords) {
             <span class="location"><span>{{ getCoords(currentData.position ?? currentLocation.position).lat }}</span>  <span>{{ getCoords(currentData.position ?? currentLocation.position).long }}</span></span>
         </div>
         <h3>Nuvarande väder</h3>
+        {{ currentData }}
         <CurrentResult :current="currentData" />
         <br>
         <h3>7 dagars Prognos</h3>

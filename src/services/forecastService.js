@@ -1,7 +1,7 @@
 export function getForecast(location) {
     return new Promise((resolve, reject) => {
         fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${location.position.lat}&longitude=${location.position.long}&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m&wind_speed_unit=ms&timezone=auto&daily=weather_code`
+            `https://api.open-meteo.com/v1/forecast?latitude=${location.position.lat}&longitude=${location.position.long}&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m&wind_speed_unit=ms&timezone=auto&daily=weather_code,sunrise,sunset`
         ) .then(response => {
             if (response.ok) {
                 return response.json()
@@ -52,11 +52,8 @@ function transformData(data, flags){
             let day = {};
             day.hourly = {};
             day.precip_sum = 0;
-            day.temp = {
-                min: data.hourly.apparent_temperature[0],
-                max: data.hourly.apparent_temperature[0],
-                average: data.hourly.apparent_temperature[0]
-            }
+            day.temp = {min: 0, max: 0};
+            day.sun = {up: '00:00', down: '00:00'};
 
             //loop for day
             for (let i=1; i < 24; i++) {
@@ -83,8 +80,9 @@ function transformData(data, flags){
             day.temp.min = Math.min(... data.hourly.temperature_2m.slice(currentDay*24, currentDay*24 + 24));
             day.temp.max = Math.max(... data.hourly.temperature_2m.slice(currentDay*24, currentDay*24 + 24));
             day.temp.average = Number(((data.hourly.temperature_2m.slice(currentDay*24, currentDay*24 + 24).reduceRight((acc, cur) => acc + cur, 0))/24).toFixed(1));
+            day.sun.up = data.daily.sunrise[data.daily.time.indexOf(day.date)];
+            day.sun.down = data.daily.sunset[data.daily.time.indexOf(day.date)];
 
-            day.precip_sum
             days[currentDay] = day;
         }
         weatherData.weather = {

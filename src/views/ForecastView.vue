@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watchEffect } from 'vue';
 import { getCurrent, getForecast } from '@/services/forecastService';
+import { getGeolocationName } from '@/services/nameService'
 import ForecastResult from '@/components/ForecastResult.vue';
 import CurrentResult from '@/components/CurrentResult.vue';
 
@@ -8,6 +9,7 @@ const currentLocation = ref({ position: {lat: 0, long: 0}, name: 'Unknown' });
 const forecastData = ref({});
 const currentData = ref({});
 const props = defineProps(['location'])
+const shownLocation = ref('Okänd');
 
 watchEffect(() => {
     let locationsList = JSON.parse(localStorage.getItem('locations'));
@@ -36,6 +38,13 @@ watchEffect(() => {
             .catch(err => {
                 console.log(err);
             });
+        getGeolocationName(currentLocation.value.position)
+        .then(response => {
+            shownLocation.value = response;
+        })
+        .catch(err => {
+            console.log(err);
+        });
     }
 });
 
@@ -47,24 +56,21 @@ function getCoords(rawCords) {
         long: Math.abs(rawCords.long).toFixed(2) + "°" + (rawCords.long < 0 ? 'W' : 'E') , 
     };
 }
-
 </script>
 
 <template>
     <template v-if="!currentLocation">
         <h2>Angiven plats saknas</h2>
-        <p>{{ props.location }} finns inte i listan över platser</p>
+        <p>{{ shownLocation }} finns inte i listan över platser</p>
     </template>
     <template v-else>
         <div class="locationContainer">
-            <h2>{{ currentLocation.name }}</h2>
+            <h2>{{ shownLocation }}</h2>
             <span class="location"><span>{{ getCoords(currentData.position ?? currentLocation.position).lat }}</span>  <span>{{ getCoords(currentData.position ?? currentLocation.position).long }}</span></span>
         </div>
-        <h3>Nuvarande väder</h3>
-        {{ currentData }}
+        <br>
         <CurrentResult :current="currentData" />
         <br>
-        <h3>7 dagars Prognos</h3>
         <ForecastResult :forecast="forecastData" />
     </template>
 </template>

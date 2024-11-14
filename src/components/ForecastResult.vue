@@ -278,8 +278,11 @@ li.rainMeter {
         margin-right: 20px;
     }
     .forecastHourTable{
+        padding: 5px;
         border-right: solid black 3px;
         border-left: solid black 3px;
+        border-bottom: solid black 3px;
+        border-radius: 0 0 10px 10px;
         box-shadow: 3px 3px 5px rgba(160, 160, 160, 0.468);
     }
     .dayCard.selected {
@@ -328,6 +331,7 @@ li.rainMeter {
         overflow-x: scroll;
         gap: 5px;
         justify-content: space-around;
+        padding-bottom: 5px;
     }
     .forecastHourTable{
         overflow-x: scroll;

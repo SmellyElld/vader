@@ -19,47 +19,76 @@ function getIcon(code, isDay) {
     return new URL(`../assets/icons/${wcIcon}`, import.meta.url);
 }
 
-function isDay(start, end, now) {
-    start = new Date(start).getTime();
-    end = new Date(end).getTime();
-    now = new Date(now).getTime();
-
-    if (start === end) {
-        return false
+function getWindColor(windSpeed) {
+    if (windSpeed < 10) {
+        return 'hsl(220, 100%, 95%)';
+    } else if (windSpeed < 15) {
+        return 'hsl(220, 100%, 70%)';
+    } else if (windSpeed < 20) {
+        return 'hsl(220, 100%, 50%)'
+    } else {
+        return 'hsl(243, 100%, 35%)'
     }
-    if (now > start && now < end) {
-        return true
-    }
-    return false
 }
 </script>
 
 <template>
-    <ul id="header">
-        <li>Date</li>
-        <li>Temp</li>
-        <li>Precip</li>
-        <li>Wind</li>
-        <li>Pressure</li>
-        <li>Cloud cover</li>
-    </ul>
-    <ul v-if="props.current.weather">
-        <div v-for="day in props.current.weather" :key="day">
-            <div><img :src="getIcon(day.code, isDay())"></div>
+    <div v-if="props.current.weather" class="currentWeather">
+        <div class="currentWeatherCard"><img :src="getIcon(props.current.weather.code, props.current.isDay)" :title="getText(props.current.weather.code)" class="weatherIcon"></div>
+        <div class="currentWeatherCard">
+            <h3>Temperatur</h3>
+            {{ Math.round(props.current.weather.temp.temp) }}{{ props.current.weather.temp.unit }}
+            ({{ props.current.weather.temp.apparent_temp }}{{ props.current.weather.temp.unit }})
         </div>
-        <li>
-            {{ new Date(props.current.weather.time).getDate() }}.{{ new Date(props.current.weather.time).getMonth() + 1 }}<br>
-            {{ getText(props.current.weather.code) }}
-        </li>
-        <li>{{ props.current.weather.temp.temp }}{{ props.current.weather.temp.unit }}<br>({{ props.current.weather.temp.apparent_temp }}{{ props.current.weather.temp.unit }})</li>
-        <li>{{ props.current.weather.precipitation.precipitation }}{{ props.current.weather.precipitation.unit }}</li>
-        <li>{{ Math.round(props.current.weather.wind.speed) }} ({{ Math.round(props.current.weather.wind.gusts) }}){{ props.current.weather.wind.wind_speed_unit }}<br>{{ props.current.weather.wind.direction }}{{ props.current.weather.wind.direction_unit }}</li>
-        <li>{{ props.current.weather.pressure.pressure }}{{ props.current.weather.pressure.unit }}</li>
-        <li>{{ props.current.weather.cloud_cover.cloud_cover }}{{ props.current.weather.cloud_cover.unit }}</li>
-    </ul>
+        <div class="currentWeatherCard">
+            <h3>Vind</h3>
+            <img src="../assets/icons/arrow.svg" :style="`transform: rotate(${props.current.weather.wind.direction}deg); background-color: ${getWindColor(props.current.weather.wind.speed)}; border-radius: 100%`" class="windDirectionIcon" :title="props.current.weather.wind.direction + props.current.weather.wind.direction_unit">
+            {{ Math.round(props.current.weather.wind.speed) }} ({{ Math.round(props.current.weather.wind.gusts) }}){{ props.current.weather.wind.wind_speed_unit }}            
+        </div>
+        <div class="currentWeatherCard">
+            <h3>Tryck</h3>
+            {{ props.current.weather.pressure.pressure }}{{ props.current.weather.pressure.unit }}
+        </div>
+        <div class="currentWeatherCard">
+            <h3>Molnighet</h3>
+            {{ props.current.weather.cloud_cover.cloud_cover }}{{ props.current.weather.cloud_cover.unit }}
+        </div>
+    </div>
 </template>
 
 <style scoped>
+    div.currentWeather {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: center;
+    }
+    div.currentWeatherCard {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        position: relative;
+        font-size: medium;
+        text-align: center;
+        padding: 0.3em;
+        width: 100px;
+        height: 100px;
+        margin: 10px;
+        border-radius: 0.6em;
+        background: linear-gradient(45deg, rgb(192, 241, 255), rgb(254, 255, 255));
+        box-shadow: 3px 3px 5px rgba(160, 160, 160, 0.468);
+        outline: 4px rgba(3, 150, 255, 0.253) solid;
+    }
+    .weatherIcon {
+        width: 70%;
+    }
+    .windDirectionIcon {
+        width: 30%;
+    }
+    h3 {
+        font-size: large;
+    }
     ul {
         padding:  5px;
         display: grid;

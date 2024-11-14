@@ -18,7 +18,7 @@ export function getForecast(location) {
 export function getCurrent(location){
     return new Promise((resolve, reject) => {
         fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${location.position.lat}&longitude=${location.position.long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=ms&forecast_days=1`
+            `https://api.open-meteo.com/v1/forecast?latitude=${location.position.lat}&longitude=${location.position.long}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=ms&forecast_days=1&current=is_day`
         ) .then(response => {
             if (response.ok) {
                 return response.json()
@@ -97,6 +97,11 @@ function transformData(data, flags){
         }
 
     } else if (flags == 2) {
+        if (data.current.is_day == 1) {
+            weatherData.isDay = true
+        } else {
+            weatherData.isDay = false
+        }
         weatherData.weather = {
             time: data.current.time,
             code: data.current.weather_code,

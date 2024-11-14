@@ -9,7 +9,7 @@ export function getGeolocationName(location) {
                 reject(response.json())
             }
         }) .then(data => {
-            resolve(data.name ?? data.display_name ?? 'okänd')
+            resolve(`${data.address.city ?? data.address.town ?? data.address.county ?? data.address.state ?? ''}, ${data.address.state}, ${data.address.country ?? 'Okänd'}`)
         });
     });
 }

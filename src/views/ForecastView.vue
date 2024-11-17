@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watchEffect } from 'vue';
 import { getCurrent, getForecast } from '@/services/forecastService';
-import { getGeolocationName } from '@/services/nameService'
 import ForecastResult from '@/components/ForecastResult.vue';
 import CurrentResult from '@/components/CurrentResult.vue';
 
@@ -9,7 +8,6 @@ const currentLocation = ref({ position: {lat: 0, long: 0}, name: 'Unknown' });
 const forecastData = ref({});
 const currentData = ref({});
 const props = defineProps(['location'])
-const shownLocation = ref('Okänd');
 
 watchEffect(() => {
     let locationsList = JSON.parse(localStorage.getItem('locations'));
@@ -38,13 +36,6 @@ watchEffect(() => {
             .catch(err => {
                 console.log(err);
             });
-        getGeolocationName(currentLocation.value.position)
-        .then(response => {
-            shownLocation.value = response;
-        })
-        .catch(err => {
-            console.log(err);
-        });
     }
 });
 
@@ -61,11 +52,11 @@ function getCoords(rawCords) {
 <template>
     <template v-if="!currentLocation">
         <h2>Angiven plats saknas</h2>
-        <p>{{ shownLocation }} finns inte i listan över platser</p>
+        <p>{{ currentLocation.name }} finns inte i listan över platser</p>
     </template>
     <template v-else>
         <div class="locationContainer">
-            <h2>{{ shownLocation }}</h2>
+            <h2>{{ currentLocation.name }}</h2>
             <span class="location"><span>{{ getCoords(currentData.position ?? currentLocation.position).lat }}</span>  <span>{{ getCoords(currentData.position ?? currentLocation.position).long }}</span></span>
         </div>
         <br>

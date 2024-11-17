@@ -1,9 +1,38 @@
 <script setup>
 import router from '@/router';
 import { getPosistion } from '@/services/positioningService';
-import { onMounted, ref } from 'vue';
+import { getGeolocationName } from '@/services/nameService';
+import { onMounted, ref, toRaw } from 'vue';
+import L from 'leaflet';
+
+const map = ref();
 
 onMounted(() => {
+    //Leaflet map
+    map.value = L.map('map').setView([0, 0], 8.5);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map.value);
+
+    let markers = L.layerGroup().addTo(toRaw(map.value));
+
+    map.value.on('click', (e) => {
+        markers.clearLayers()
+        const marker = L.marker(e.latlng).addTo(toRaw(map.value));
+        markers.addLayer(marker)
+        location.value.position = {lat: Number(e.latlng.lat), long: Number(e.latlng.lng)}
+        getGeolocationName({lat: Number(e.latlng.lat), long: Number(e.latlng.lng)})
+            .then((name) => {
+                location.value.name = name
+                marker.bindPopup(name).openPopup();
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    })
+
+    //Find or create current location and add to locationsList
     locationsList.value = JSON.parse(localStorage.getItem("locations"));
     let current = locationsList.value.find(loc => {
         return loc.name === 'Current location'
@@ -13,6 +42,14 @@ onMounted(() => {
         locationsList.value.unshift(current)
     }
 
+    let defaultLoc = locationsList.value.find(loc => {
+        return loc.default === true;
+    });
+
+    setMap(defaultLoc.position, defaultLoc.name);
+
+
+    //gets current location
     getPosistion()
         .then(response => {
             current.position = response.position
@@ -33,25 +70,20 @@ onMounted(() => {
 const location = ref({name: '', position: {lat: 0, long: 0}, default: false})
 const locationsList = ref([])
 
-function resetInput() {
-    const inputs = document.querySelectorAll(".input");
-    for (let input of inputs) {
-        input.value = "";
-    }
+function setMap(location) {
+    map.value.setView([location.lat, location.long], 9);
 }
-
 
 function saveLocation() {
     if (location.value.name != "") {
         locationsList.value.push({name: location.value.name, position: {lat: location.value.position.lat, long: location.value.position.long}, default: false});
-        resetInput()
     }
     if (locationsList.value.find((obj) => {
-        if (obj.default) {
-            return true;
-        }
-        return false;
-    }) == undefined){
+            if (obj.default) {
+                return true;
+            }
+            return false;
+        }) == undefined){
         locationsList.value[0].default = true;
     }
     localStorage.setItem("locations", JSON.stringify(locationsList.value))
@@ -86,12 +118,8 @@ function setDefault(e) {
 </script>
 
 <template>
-    <h2>Location</h2>
-    <label>Name: <input type="text" v-model="location.name" class="input" /></label>
-    <label>Lat: <input type="number" max="90" min="-90" step="0.1" size="5" v-model="location.position.lat" class="input"></label>
-    <label>Long: <input type="number" max="180" min="-180" step="0.1" size="8" v-model="location.position.long" class="input"></label>
-    <button @click="saveLocation">Save</button><button @click="resetInput">Reset</button>
-    <hr>
+    <div id="map"></div>
+    <button @click="saveLocation">Lägg till plats</button>
     <h3>List</h3>
         <ul id="locationList">
             <li v-for="loc in locationsList" :key="loc" :class="loc.default ? 'default':''" :id="'locationItem' + locationsList.indexOf(loc)">
@@ -107,6 +135,9 @@ function setDefault(e) {
 </template>
 
 <style scoped>
+#map {
+    height: 400px; 
+}
 label {
     display: block;
     width: 15em;

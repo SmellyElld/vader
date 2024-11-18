@@ -6,6 +6,8 @@ import { onMounted, ref, toRaw } from 'vue';
 import L from 'leaflet';
 
 const map = ref();
+const location = ref({name: '', position: {lat: 0, long: 0}, default: false})
+const locationsList = ref([])
 
 onMounted(() => {
     //Leaflet map
@@ -15,13 +17,14 @@ onMounted(() => {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map.value);
 
+    //Place marker on map and remove any other
     let markers = L.layerGroup().addTo(toRaw(map.value));
-
     map.value.on('click', (e) => {
         markers.clearLayers()
         const marker = L.marker(e.latlng).addTo(toRaw(map.value));
-        markers.addLayer(marker)
-        location.value.position = {lat: Number(e.latlng.lat), long: Number(e.latlng.lng)}
+        markers.addLayer(marker);
+        location.value.position = {lat: Number(e.latlng.lat), long: Number(e.latlng.lng)};
+        //Get geolocation name for popup and open it
         getGeolocationName({lat: Number(e.latlng.lat), long: Number(e.latlng.lng)})
             .then((name) => {
                 location.value.name = name
@@ -46,7 +49,7 @@ onMounted(() => {
         return loc.default === true;
     });
 
-    setMap(defaultLoc.position, defaultLoc.name);
+    map.value.setView([defaultLoc.position.lat, defaultLoc.position.long], 9);
 
     //gets current location
     getPosistion()
@@ -66,13 +69,7 @@ onMounted(() => {
         })
 });
 
-const location = ref({name: '', position: {lat: 0, long: 0}, default: false})
-const locationsList = ref([])
-
-function setMap(location) {
-    map.value.setView([location.lat, location.long], 9);
-}
-
+//Saves a location to list and local storage, cannot be empty
 function saveLocation() {
     if (location.value.name != "") {
         locationsList.value.push({name: location.value.name, position: {lat: location.value.position.lat, long: location.value.position.long}, default: false});
@@ -88,6 +85,7 @@ function saveLocation() {
     localStorage.setItem("locations", JSON.stringify(locationsList.value))
 }
 
+//Remove a location from list and local storage with the help of element id
 function removeLocation(e) {
     console.log(e.target.parentElement.parentElement.id);
     let defaultDeleted = false
@@ -104,6 +102,7 @@ function removeLocation(e) {
     localStorage.setItem("locations", JSON.stringify(locationsList.value))
 }
 
+//Sets default location in list and localstorage with the help of element id
 function setDefault(e) {
     for (let loc of locationsList.value) {
         if (locationsList.value.indexOf(loc) == e.target.parentElement.id.slice(12)) {

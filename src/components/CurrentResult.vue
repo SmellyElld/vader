@@ -5,6 +5,7 @@ import { ref } from "vue";
 const props = defineProps(['current']);
 const weatherCodes = ref(wc);
 
+//Get weather text from weather code
 function getText(code) {
     let wcText = weatherCodes.value.find(itm => {
         return itm.code == code
@@ -12,6 +13,7 @@ function getText(code) {
     return wcText
 }
 
+//Get weather icon source from weather code
 function getIcon(code, isDay) {
     let wcIcon = weatherCodes.value.find(itm => {
         return itm.code == code
@@ -19,15 +21,16 @@ function getIcon(code, isDay) {
     return new URL(`../assets/icons/${wcIcon}`, import.meta.url);
 }
 
+//returns diffrent colors for diffrent wind speeds
 function getWindColor(windSpeed) {
     if (windSpeed < 10) {
         return 'hsl(220, 100%, 95%)';
     } else if (windSpeed < 15) {
         return 'hsl(220, 100%, 70%)';
     } else if (windSpeed < 20) {
-        return 'hsl(220, 100%, 50%)'
+        return 'hsl(220, 100%, 50%)';
     } else {
-        return 'hsl(243, 100%, 35%)'
+        return 'hsl(243, 100%, 35%)';
     }
 }
 </script>

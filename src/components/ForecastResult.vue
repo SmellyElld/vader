@@ -6,6 +6,7 @@ const props = defineProps(['forecast']);
 const weatherCodes = ref(wc);
 const forecastLoaded = ref(false);
 
+//Get weather text from weather code
 function getText(code) {
     let wcText = weatherCodes.value.find(itm => {
         return itm.code == code
@@ -13,6 +14,7 @@ function getText(code) {
     return wcText
 }
 
+//Get weather icon source from weather code
 function getIcon(code, isDay) {
     let wcIcon = weatherCodes.value.find(itm => {
         return itm.code == code
@@ -20,24 +22,34 @@ function getIcon(code, isDay) {
     return new URL(`../assets/icons/${wcIcon}`, import.meta.url);
 }
 
+/**
+ * Check if provided time is daytime
+ * @param start When the sun goes up
+ * @param end When the sun goes down
+ * @param now The current time
+ */
 function isDay(start, end, now) {
     start = new Date(start).getTime();
     end = new Date(end).getTime();
     now = new Date(now).getTime();
 
+    //if the sun doesn't go up
     if (start === end) {
         return false
     }
+    //if now is between start and end i.e. it is day
     if (now > start && now < end) {
         return true
     }
     return false
 }
 
+//Show forecast of a date
+//Sets so only one forecast div has selected class
 function showForecast(date) {
     let forecastDays = document.getElementsByClassName('forecastDay');
     let buttons = document.getElementsByClassName('dayCard');
-
+    //Forecast
     for (let forecast of forecastDays){
         if (forecast.id == 'forecastID' + date) {
             forecast.classList.remove('unselected')
@@ -47,6 +59,7 @@ function showForecast(date) {
             forecast.classList.add('unselected')
         }
     }
+    //Buttons
     for (let button of buttons) {
         if (button.id == 'daycardID' + date) {
             button.classList.remove('unselected')
@@ -58,7 +71,12 @@ function showForecast(date) {
     }
 }
 
-function getDayNameShort(date, type='short') {
+/**
+ * Gets day in swedish
+ * @param date a date
+ * @param type Can be "short" for only two first letters or "full" for the whole name
+ */
+function getDayName(date, type='short') {
     // Array of day names
     const dayNames = [
         'Söndag',
@@ -82,6 +100,7 @@ function getDayNameShort(date, type='short') {
     }
 }
 
+//return annother color if precip prob is above 45
 function getColor(precipProb) {
     if (precipProb > 45) {
         return 'rgb(255,255,255)';
@@ -90,6 +109,7 @@ function getColor(precipProb) {
     }
 }
 
+//returns diffrent colors for diffrent wind speeds
 function getWindColor(windSpeed) {
     if (windSpeed < 10) {
         return 'hsl(220, 100%, 95%)';
@@ -102,12 +122,14 @@ function getWindColor(windSpeed) {
     }
 }
 
+//Check if a date is older than current time minus an hour
 function isOld(datetime) {
     if (new Date(datetime).getTime() < Date.now() - 3600000) {
         return 'prev';
     }
 }
 
+//open current forecast
 watch(forecastLoaded, () => {
     showForecast(new Date().toISOString().split('T')[0]);
 });
@@ -117,7 +139,7 @@ watch(forecastLoaded, () => {
     <section v-if="props.forecast.weather">
         <div class="forecastNav">
             <div v-for="day in props.forecast.weather.days" :key="day" class="dayCard" :id="'daycardID' + day.date" @click="showForecast(day.date)">
-                <span>{{ getDayNameShort(new Date(day.date), 'full') }}</span>
+                <span>{{ getDayName(new Date(day.date), 'full') }}</span>
                 <span class="img"><img :src="getIcon(day.code, true)" :alt="getText(day.code)"></span>
                 {{ day.temp.average }}{{ props.forecast.weather.units.temp }}
             </div>
@@ -125,7 +147,7 @@ watch(forecastLoaded, () => {
         <div class="forecast">
             <div v-for="day in props.forecast.weather.days" :key="day" class="forecastDay unselected" :id="'forecastID' + day.date">
                 <div class="forecastHourTableHeader">
-                    {{ getDayNameShort(new Date(day.date), 'full') }} {{ (new Date(day.date)).getDate() }}.{{ (new Date(day.date)).getMonth() + 1}}
+                    {{ getDayName(new Date(day.date), 'full') }} {{ (new Date(day.date)).getDate() }}.{{ (new Date(day.date)).getMonth() + 1}}
                 </div>
                 <div class="forecastHourTable">
                     <ul v-for="hour in day.hourly" :key="hour" :class="isOld(day.date + 'T' + hour.time)">

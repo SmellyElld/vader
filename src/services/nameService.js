@@ -1,3 +1,4 @@
+//Gets a geolocation from nomination openstreetmap from coordinates 
 export function getGeolocationName(location) {
     return new Promise((resolve, reject) => {
         fetch(
@@ -14,6 +15,7 @@ export function getGeolocationName(location) {
     });
 }
 
+//Makes a string from nomination data
 function makeString(data) {
     if (!data.address) {
         return 'Okänd'

@@ -1,3 +1,4 @@
+//Gets position
 export function getPosistion() {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {

@@ -12,17 +12,22 @@ const props = defineProps(['location'])
 const shownLocation = ref('Okänd');
 
 watchEffect(() => {
+    //Get locations from localstorage
     let locationsList = JSON.parse(localStorage.getItem('locations'));
+
+    //if the location prop is provided check if it is in locations list
     if (props.location) {
         currentLocation.value = locationsList.find(loc => {
             return loc.name.toLocaleLowerCase() === props.location.toLocaleLowerCase()
         })
+    //if the location prop is not provided it will default to default location
     } else {
         currentLocation.value = locationsList.find(loc => {
             return loc.default
         })
     }
 
+    //if a location exists get forecast
     if (currentLocation.value) {
         getForecast(currentLocation.value)
             .then(response => {
@@ -38,7 +43,8 @@ watchEffect(() => {
             .catch(err => {
                 console.log(err);
             });
-
+        
+        //If the posistion is 'Nuvarande position' get a name for it
         if (currentLocation.value.name == 'Nuvarande position')
             getGeolocationName(currentLocation.value.position)
                 .then(response => {
@@ -53,9 +59,8 @@ watchEffect(() => {
     }
 });
 
+//return a prettier coordinate string
 function getCoords(rawCords) {
-    Math.abs(rawCords.lat).toFixed(2)
-
     return {
         lat: Math.abs(rawCords.lat).toFixed(2) + "°" + (rawCords.lat < 0 ? 'S' : 'N'),
         long: Math.abs(rawCords.long).toFixed(2) + "°" + (rawCords.long < 0 ? 'W' : 'E') , 

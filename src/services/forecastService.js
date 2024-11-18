@@ -1,3 +1,4 @@
+//Gets hourly forecast from open meteo
 export function getForecast(location) {
     return new Promise((resolve, reject) => {
         fetch(
@@ -14,7 +15,7 @@ export function getForecast(location) {
     });
 }
 
-
+//Gets the current weather from open meteo
 export function getCurrent(location){
     return new Promise((resolve, reject) => {
         fetch(
@@ -32,7 +33,7 @@ export function getCurrent(location){
 }
 
 /**
- * Transforms data from open metio to a more usable format
+ * Transforms data from open meteo to a more usable format
  * @param {object} data 
  * @param {int} flags 
  * 1:forecast 2:current

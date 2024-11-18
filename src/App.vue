@@ -2,6 +2,7 @@
 import { RouterView } from 'vue-router'
 import { onMounted } from 'vue';
 
+//Load locations from localstorage
 onMounted(() => {
   let locations = JSON.parse(localStorage.getItem('locations'));
   if (!locations) {
@@ -9,7 +10,6 @@ onMounted(() => {
     localStorage.setItem('locations', JSON.stringify(location));
   }
 })
-
 </script>
 
 <template>

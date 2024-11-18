@@ -35,10 +35,10 @@ onMounted(() => {
     //Find or create current location and add to locationsList
     locationsList.value = JSON.parse(localStorage.getItem("locations"));
     let current = locationsList.value.find(loc => {
-        return loc.name === 'Current location'
+        return loc.name === 'Nuvarande position'
     });
     if (!current) {
-        current = {name: 'Current location', position: {lat: 0, long: 0}, default: false};
+        current = {name: 'Nuvarande position', position: {lat: 0, long: 0}, default: false};
         locationsList.value.unshift(current)
     }
 
@@ -48,19 +48,18 @@ onMounted(() => {
 
     setMap(defaultLoc.position, defaultLoc.name);
 
-
     //gets current location
     getPosistion()
         .then(response => {
             current.position = response.position
             let index = locationsList.value.findIndex(loc => {
-                return loc.name === 'Current location';
+                return loc.name === 'Nuvarande position';
             });
             locationsList.value.splice(index, 1, current);
         })
         .catch(err => {
             let index = locationsList.value.findIndex(loc => {
-                return loc.name === 'Current location';
+                return loc.name === 'Nuvarande position';
             });
             locationsList.value.splice(index, 1);
             console.log(err)
@@ -90,9 +89,10 @@ function saveLocation() {
 }
 
 function removeLocation(e) {
+    console.log(e.target.parentElement.parentElement.id);
     let defaultDeleted = false
     locationsList.value = locationsList.value.filter((obj) => {
-        let objToDel = locationsList.value.indexOf(obj) == e.target.parentElement.id.slice(12);
+        let objToDel = locationsList.value.indexOf(obj) == e.target.parentElement.parentElement.id.slice(12);
         if (obj.default && objToDel) {
             defaultDeleted = true
         }
@@ -118,40 +118,96 @@ function setDefault(e) {
 </script>
 
 <template>
-    <div id="map"></div>
-    <button @click="saveLocation">Lägg till plats</button>
-    <h3>List</h3>
-        <ul id="locationList">
-            <li v-for="loc in locationsList" :key="loc" :class="loc.default ? 'default':''" :id="'locationItem' + locationsList.indexOf(loc)">
-                <span @click="setDefault">
-                    {{ loc.name }},
-                    ( {{ Math.abs(loc.position.lat).toFixed(2) }}°{{ loc.position.lat > 0 ? 'N' : 'S' }}
-                    {{ Math.abs(loc.position.long).toFixed(2) }}°{{ loc.position.long > 0 ? 'E' : 'W'}}
-                    )
-                </span>
-                <span class="delete" @click="removeLocation" v-show="loc.name !== 'Current location'">x</span>
-            </li>
-        </ul>
+    <div id="mapContainer">
+        <div id="map"></div>
+        <button @click="saveLocation" id="addButton">Lägg till plats</button>
+    </div>
+    <ul id="locationList">
+        <li v-for="loc in locationsList" :key="loc" :class="loc.default ? 'default':''" :id="'locationItem' + locationsList.indexOf(loc)" class="location">
+            <span @click="setDefault">
+                {{ loc.name }},
+                ( {{ Math.abs(loc.position.lat).toFixed(2) }}°{{ loc.position.lat > 0 ? 'N' : 'S' }}
+                {{ Math.abs(loc.position.long).toFixed(2) }}°{{ loc.position.long > 0 ? 'E' : 'W'}}
+                )
+            </span>
+            <span class="delete" @click="removeLocation" v-show="loc.name !== 'Nuvarande position'"><img src="@/assets/icons/remove.svg" style="width: inherit; height: inherit;"></span>
+        </li>
+    </ul>
 </template>
 
 <style scoped>
 #map {
-    height: 400px; 
+    height: 400px;
+    box-shadow: 3px 3px 5px rgba(160, 160, 160, 0.222);
+    border-radius: 10px;
+}
+#addButton {
+    justify-content: center;
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 6px;
+    padding: 15px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: #000;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    background: linear-gradient(45deg, rgb(192, 241, 255), rgb(254, 255, 255));
+}
+#addButton:hover {
+    background: linear-gradient(45deg, rgb(153, 233, 255), rgb(254, 255, 255));
 }
 label {
     display: block;
     width: 15em;
     padding-top: 0.5em;
 }
-
+#locationList {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    padding: 5px;
+}
+.location {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(-10deg, rgb(175, 235, 255), rgb(254, 255, 255));
+    padding: 13px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 3px 3px 5px rgba(160, 160, 160, 0.233);
+}
+.default {
+    border: solid black 3px;
+    background: linear-gradient(-20deg, rgb(50, 155, 255), rgb(192, 241, 255) 30%);
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
 .default span {
-    font-weight: bold;
+    font-weight: 600;
+    font-size: medium;
 }
 .delete {
-    color: red;
+    width: 20px;
+    height: 20px;
+    color: rgb(255, 0, 0);
+    border-radius: 2px;
 }
 .delete:hover {
-    background-color: brown;
     cursor: pointer;
+    background-color: rgb(255, 0, 0);
+}
+@media (max-width: 650px) {
+    #map {
+        height: 600px;
+        border-radius: 0px;
+    }
 }
 </style>

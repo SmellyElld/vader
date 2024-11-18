@@ -9,7 +9,28 @@ export function getGeolocationName(location) {
                 reject(response.json())
             }
         }) .then(data => {
-            resolve(`${data.address.city ?? data.address.town ?? data.address.municipality ?? data.address.county ?? ''}, ${data.address.state ?? data.address.county}, ${data.address.country ?? 'Okänd'}`)
+            resolve(makeString(data))
         });
     });
+}
+
+function makeString(data) {
+    if (!data.address) {
+        return 'Okänd'
+    }
+
+    let locString = '';
+
+    locString += data.address.city ?? data.address.town ?? data.address.municipality ?? '';
+    if (locString.length !== 0) {
+        locString += ', ';
+    }
+    let locStringZoom2 = data.address.state ?? data.address.county ?? data.address.state_district ?? '';
+    locString += locStringZoom2
+    if (locStringZoom2.length !== 0) {
+        locString += ', ';
+    }
+    locString += data.address.country ?? 'Okänd';
+
+    return locString;
 }

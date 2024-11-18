@@ -15,10 +15,6 @@ function toggleActive() {
             <span class="burger-bar bar--3"></span>
         </button>
     </div>
-    <nav class="navbar" v-show="props.active">
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/location">Locations</RouterLink>
-    </nav>
 </template>
 
 <style scoped>

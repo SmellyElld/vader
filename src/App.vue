@@ -1,7 +1,6 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import BurgerMenu from './components/BurgerMenu.vue';
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 
 onMounted(() => {
   let locations = JSON.parse(localStorage.getItem('locations'));
@@ -11,16 +10,32 @@ onMounted(() => {
   }
 })
 
-const menuActive = ref(false);
 </script>
 
 <template>
   <header>
-    <BurgerMenu @toggle-menu="menuActive = !menuActive" :active="menuActive" />
+    <nav class="navbar">
+        <RouterLink to="/">Väder</RouterLink>
+        <RouterLink to="/location">Platser</RouterLink>
+    </nav>
   </header>
 
   <RouterView />
 </template>
 
 <style scoped>
+  .navbar a {
+    color: black;
+    font-size: large;
+    padding: 10px;
+    background: linear-gradient(10deg rgb(237, 255, 255) rgb(186, 247, 255));
+  }
+  .navbar a:hover {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0);
+  }
+  .navbar {
+    display: flex;
+    justify-content: center;
+  }
 </style>
